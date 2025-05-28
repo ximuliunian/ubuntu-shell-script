@@ -4,6 +4,9 @@
 if [ $# -ne 2 ]; then
     echo "用法: $0 <挂载目录> <监听端口>"
     echo "例子: $0 ~/apps/nginx 8080"
+    echo "前置条件:"
+    echo "  1. 具备 Docker 环境"
+    echo "  2. 已拉取 Nginx 镜像（docker pull nginx）"
     exit 1
 fi
 
