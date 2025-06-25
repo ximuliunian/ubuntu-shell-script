@@ -35,7 +35,7 @@ EOF
 
 # 设置安全的目录权限
 echo "正在设置目录权限..."
-chmod 755 "${MOUNT_DIR}" "${MOUNT_DIR}/storage" "${MOUNT_DIR}/logs"
+chmod -R 777 "${MOUNT_DIR}" "${MOUNT_DIR}/storage" "${MOUNT_DIR}/logs"
 chown -R "$USER:$USER" "${MOUNT_DIR}"
 
 # 运行容器
@@ -48,6 +48,8 @@ docker run -d \
     -v "${MOUNT_DIR}/storage:/app/server/storage" \
     -v "${MOUNT_DIR}/.env:/app/server/.env" \
     -v "${MOUNT_DIR}/logs:/var/log/anythingllm" \
+    -e STORAGE_DIR=/app/server/storage \
+    -e STORAGE_DIR_HOST=${MOUNT_DIR}/storage \
     "${IMAGE_NAME}"
 
 # 验证容器状态
@@ -57,6 +59,7 @@ if [ $? -eq 0 ]; then
     echo "   数据存储路径: ${MOUNT_DIR}/storage"
     echo "   日志存储路径: ${MOUNT_DIR}/logs"
     echo "   配置文件路径: ${MOUNT_DIR}/.env"
+    echo "   日志：docker logs -f ${CONTAINER_NAME}"
 else
     echo "❌ 容器启动失败，请检查日志: docker logs ${CONTAINER_NAME}"
     exit 1
