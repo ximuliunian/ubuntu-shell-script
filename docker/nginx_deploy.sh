@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # 检查参数数量
-if [ $# -ne 2 ]; then
-    echo "用法: $0 <挂载目录> <监听端口>"
-    echo "例子: $0 ~/apps/nginx 8080"
+if [ $# -ne 3 ]; then
+    echo "用法: $0 <挂载目录> <监听端口> <容器名称>"
+    echo "例子: $0 ~/apps/nginx 8080 nginx"
     echo "前置条件:"
     echo "  1. 具备 Docker 环境"
     echo "  2. 已拉取 Nginx 镜像（docker pull nginx）"
@@ -13,6 +13,7 @@ fi
 # 定义变量
 MOUNT_DIR=$1
 HOST_PORT=$2
+NGINX_NAME=$3
 
 # 创建挂载目录结构
 echo "正在创建挂载目录..."
@@ -22,8 +23,8 @@ mkdir -p "${MOUNT_DIR}/html"
 
 # 清理已存在的nginx容器
 echo "正在清理已存在的nginx容器..."
-docker stop nginx 2>/dev/null || true
-docker rm nginx 2>/dev/null || true
+docker stop "${NGINX_NAME}" 2>/dev/null || true
+docker rm "${NGINX_NAME}" 2>/dev/null || true
 
 # 创建临时容器用于提取配置文件
 echo "正在创建临时容器以提取配置文件..."
@@ -45,7 +46,7 @@ docker rm temp-nginx > /dev/null
 echo "正在启动nginx容器..."
 docker run -d \
     -p "${HOST_PORT}:80" \
-    --name nginx \
+    --name "${NGINX_NAME}" \
     -v "${MOUNT_DIR}/conf/nginx.conf:/etc/nginx/nginx.conf" \
     -v "${MOUNT_DIR}/conf/conf.d:/etc/nginx/conf.d" \
     -v "${MOUNT_DIR}/log:/var/log/nginx" \
